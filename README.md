@@ -1,13 +1,15 @@
 <div align="center">
 
-# 🤖 NotABot
+# NotABot.online
 
 ### "Stripe for Web3 Identity"
-https://mainhntrepo-nextjs-uurk.vercel.app/
+https://notabot.online
 
 **Universal Multi-Chain Proof-of-Humanity Protocol**  
 Verify once on ANY chain → Access everywhere
 
+"The goal is not to maximize decentralization, but to achieve a sufficiently decentralized system."
+- Vitalik Buterin.
 [![Solidity](https://img.shields.io/badge/Solidity-^0.8.20-363636?logo=solidity)](https://soliditylang.org)
 [![Rust](https://img.shields.io/badge/Rust-Anchor-orange?logo=rust)](https://www.rust-lang.org)
 [![Base L2](https://img.shields.io/badge/Network-Base%20Sepolia-0052FF)](https://base.org)
@@ -17,34 +19,28 @@ Verify once on ANY chain → Access everywhere
 [![Tests](https://img.shields.io/badge/Tests-26%2F26%20passing-brightgreen)](./packages/hardhat/test)
 [![CI](https://img.shields.io/badge/CI-Passing-brightgreen)](./.github/workflows/ci.yml)
 
-**🏆 ETH Bishkek 2024 Winners** | Now Expanding to Solana
+**🏆 ETH Bishkek 2025 Win**
 
-[🏗️ Architecture](./docs/ARCHITECTURE.md) • [📡 API Docs](./packages/backend/API.md) • [⚡ Solana Docs](./solana/ARCHITECTURE.md) • [🚀 Roadmap](./docs/4STEPSPROD.MD) • [🤝 Contributing](./CONTRIBUTING.md)
+[Contributing](./CONTRIBUTING.md)
 
 </div>
 
 ---
 
-## 🌐 Multi-Chain Expansion
-
-**We won ETH Bishkek with Base L2 deployment. Now we're going everywhere.**
-
 | Blockchain | Status | Why It Matters |
 |------------|--------|----------------|
 | **Base L2** | ✅ Deployed | EVM DeFi ecosystem |
 | **Status Network** | ✅ Deployed | Privacy-focused L2 |
-| **Solana** | 🚧 Deploying | GameFi + 65k TPS |
-| Ethereum | 🔜 Q2 2025 | Maximum security |
-| Optimism | 🔜 Q2 2025 | Superchain bridge |
-| Arbitrum | 🔜 Q2 2025 | Largest L2 |
+| **Solana** | ✅  Deployed | GameFi + 65k TPS |
 
-**Vision:** Become THE identity layer for ALL of Web3, not just one chain.
+**Vision:** Become THE stablest identity layer for ALL of Web3.
 
 ---
 
 ## The Problem
 
-Airdrops are getting destroyed by bots. 60-90% of participants aren't real humans. Arbitrum lost $50M+ in 2023 alone.
+Don't your remember 2021? Bots, that are killing trustable concurrency between people.
+Airdrops and DAOs are getting destroyed by bots. 60 - 90% of participants aren't real humans. Arbitrum lost $50M+ in 2023 alone.
 
 **Solana's Problem is WORSE:**
 - Transactions cost $0.00025 (vs $2+ on Ethereum)
@@ -95,7 +91,6 @@ yarn install
 ```
 
 ### Local Development
-
 ```bash
 # Terminal 1: Start local blockchain
 yarn chain
@@ -130,11 +125,10 @@ Visit `http://localhost:3000`
 User → Adapter verifies proof → MainAggregator registers → Mints 1 HMT token
 ```
 
-See detailed diagrams: [ARCHITECTURE_DIAGRAM.md](./ARCHITECTURE_DIAGRAM.md)
 
 ---
 
-## 📋 Usage Examples
+## Real-work Examples
 
 ### For dApp Developers
 
@@ -210,30 +204,7 @@ See [SAFE.MD](./SAFE.MD) for details.
 
 ---
 
-## 🎯 Roadmap
-
-### ✅ Hackathon MVP (Done!)
-- ✅ Core contracts deployed on Base Sepolia
-- ✅ 4 adapters: Worldcoin, Gitcoin, PoH, BrightID
-- ✅ Backend API with demo mode
-- ✅ Integration guide (5 minutes)
-- ✅ 26/26 tests passing
-
-### 🔜 Post-Hackathon (1 month)
-- Mainnet launch (Base L2)
-- Real Worldcoin/PoH/BrightID integrations (remove demo mode)
-- First 5 dApp partnerships
-- Security audit
-
-### 🚀 Long-term Vision
-- Binance/Coinbase KYC adapters
-- Cross-chain SBT (Hyperlane/LayerZero)
-- SaaS model ($99/month for dApps)
-- Become standard for Web3 identity
-
----
-
-## 🛠️ Tech Stack
+## Stack
 
 **Smart Contracts:**
 - Solidity ^0.8.20
@@ -253,7 +224,7 @@ See [SAFE.MD](./SAFE.MD) for details.
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 - **[5-Minute Integration Guide](./docs/INTEGRATION.md)** ← Start here!
 - [Architecture Overview](./docs/ARCHITECTURE.md)
@@ -265,7 +236,7 @@ See [SAFE.MD](./SAFE.MD) for details.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
@@ -282,17 +253,9 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guideline
 
 ---
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](./LICENSE)
-
----
-
-## 🏆 Built with Scaffold-ETH 2
-
-This project was bootstrapped with [Scaffold-ETH 2](https://scaffoldeth.io).
-
-**Sponsors:** BuidlGuidl
 
 ---
 
@@ -300,12 +263,8 @@ This project was bootstrapped with [Scaffold-ETH 2](https://scaffoldeth.io).
 
 **TL;DR:** Verify once → Access everywhere. 5-minute integration for dApps.
 
-### 🏆 Built for ETHGlobal Hackathon 2025
 
-**Live on Base Sepolia** • **4 Verification Sources** • **26/26 Tests Passing**
+[Watch Video](#)
 
-[Try Demo](#) • [Integration Guide](./INTEGRATION.md) • [Watch Video](#)
-
-Made with ❤️ for Web3
 
 </div>
