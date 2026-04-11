@@ -8,6 +8,7 @@ import "../src/adapters/GitcoinAdapter.sol";
 import "../src/adapters/PoHAdapter.sol";
 import "../src/adapters/BrightIDAdapter.sol";
 import "../src/adapters/WorldcoinAdapter.sol";
+import "../src/adapters/ConcordiumAdapter.sol";
 
 contract Deploy is Script {
     function run() external {
@@ -29,12 +30,16 @@ contract Deploy is Script {
         aggregator.addAdapter(address(poh), 2);
         aggregator.addAdapter(address(brightid), 3);
 
+        ConcordiumAdapter concordium = new ConcordiumAdapter(address(aggregator), oracle);
+        aggregator.addAdapter(address(concordium), 4);
+
         vm.stopBroadcast();
 
-        console2.log("VerificationToken:", address(token));
-        console2.log("MainAggregator:   ", address(aggregator));
-        console2.log("GitcoinAdapter:   ", address(gitcoin));
-        console2.log("PoHAdapter:       ", address(poh));
-        console2.log("BrightIDAdapter:  ", address(brightid));
+        console2.log("VerificationToken:   ", address(token));
+        console2.log("MainAggregator:      ", address(aggregator));
+        console2.log("GitcoinAdapter:      ", address(gitcoin));
+        console2.log("PoHAdapter:          ", address(poh));
+        console2.log("BrightIDAdapter:     ", address(brightid));
+        console2.log("ConcordiumAdapter:   ", address(concordium));
     }
 }
