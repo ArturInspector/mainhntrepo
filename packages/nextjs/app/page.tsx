@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ConcordiumVerify } from "../components/ConcordiumVerify";
 
 const ORACLE = "0x8Cec9277d761f947e29EBeACc4035DDCDB10c2BD";
 
@@ -243,6 +244,7 @@ export default function HomePage() {
             { name: "Gitcoin Passport", type: "Reputation", acc: "90.9%", color: "#2558ff" },
             { name: "Proof of Humanity", type: "Social + Video", acc: "79.5%", color: "#7c3aed" },
             { name: "BrightID", type: "Social Graph", acc: "85.0%", color: "#f59e0b" },
+            { name: "Concordium", type: "KYC Protocol", acc: "97.0%", color: "#0cb88e" },
           ].map((src) => (
             <div key={src.name}>
               <p className="text-[14px] font-medium text-white/50">{src.name}</p>
@@ -275,6 +277,22 @@ export default function HomePage() {
               <span className="text-[15px] text-white/20">{uc.desc}</span>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── Concordium verification ── */}
+      <section className="mx-auto max-w-5xl px-6 pb-24">
+        <p className="text-sm tracking-wide text-[#0cb88e]">New</p>
+        <h2 className="mt-4 text-[clamp(1.5rem,3vw,2.2rem)] font-medium leading-tight tracking-[-0.03em]">
+          Verify with Concordium
+        </h2>
+        <p className="mt-3 max-w-md text-[15px] text-white/30">
+          The only L1 with KYC at the protocol level. Your identity stays private — only the proof goes on-chain.
+        </p>
+        <div className="mt-8 max-w-md">
+          <ConcordiumVerify
+            concordiumAdapterAddress={process.env.NEXT_PUBLIC_CONCORDIUM_ADAPTER_ADDRESS as `0x${string}` ?? "0x0000000000000000000000000000000000000000"}
+          />
         </div>
       </section>
 

@@ -1,0 +1,110 @@
+.concordium-verify {
+  background: linear-gradient(135deg, rgba(12, 184, 142, 0.08) 0%, rgba(0, 98, 255, 0.05) 100%);
+  border: 1px solid rgba(12, 184, 142, 0.25);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.concordium-verify__header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.concordium-verify__badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: rgba(12, 184, 142, 0.15);
+  color: #0cb88e;
+  border: 1px solid rgba(12, 184, 142, 0.3);
+}
+
+.concordium-verify__badge--kyc {
+  background: rgba(0, 98, 255, 0.12);
+  color: #4d8fff;
+  border-color: rgba(0, 98, 255, 0.25);
+}
+
+.concordium-verify__description {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.concordium-verify__btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0cb88e, #0062ff);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  width: 100%;
+}
+
+.concordium-verify__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.concordium-verify__btn:not(:disabled):hover {
+  opacity: 0.85;
+}
+
+.concordium-verify__btn--retry {
+  background: rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+}
+
+.concordium-verify__status {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  padding: 12px 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.concordium-verify__success {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(12, 184, 142, 0.12);
+  border: 1px solid rgba(12, 184, 142, 0.3);
+  border-radius: 10px;
+  font-size: 13px;
+  color: #0cb88e;
+  font-weight: 600;
+}
+
+.concordium-verify__tx {
+  font-size: 11px;
+  color: rgba(12, 184, 142, 0.7);
+  text-decoration: underline;
+}
+
+.concordium-verify__error {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255, 80, 80, 0.08);
+  border: 1px solid rgba(255, 80, 80, 0.2);
+  border-radius: 10px;
+  font-size: 13px;
+  color: rgba(255, 120, 120, 0.9);
+}
