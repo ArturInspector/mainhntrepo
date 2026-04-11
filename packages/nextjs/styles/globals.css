@@ -24,14 +24,14 @@
   --color-accent-content: #ffffff;
   --color-neutral: #111827;
   --color-neutral-content: #ffffff;
-  --color-base-100: #ffffff;
-  --color-base-200: #fafafa;
-  --color-base-300: #e5e7eb;
-  --color-base-content: #111827;
+  --color-base-100: #08080d;
+  --color-base-200: #0c0c14;
+  --color-base-300: #14141f;
+  --color-base-content: #f0f0f5;
   --color-info: #2558ff;
-  --color-success: #18a957;
-  --color-warning: #d97706;
-  --color-error: #dc2626;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
 
   --radius-field: 9999rem;
   --radius-box: 1rem;
@@ -41,22 +41,22 @@
 @plugin "daisyui/theme" {
   name: "dark";
 
-  --color-primary: #212638;
-  --color-primary-content: #f9fbff;
-  --color-secondary: #323f61;
-  --color-secondary-content: #f9fbff;
-  --color-accent: #4969a6;
-  --color-accent-content: #f9fbff;
-  --color-neutral: #f9fbff;
-  --color-neutral-content: #385183;
-  --color-base-100: #385183;
-  --color-base-200: #2a3655;
-  --color-base-300: #212638;
-  --color-base-content: #f9fbff;
-  --color-info: #385183;
-  --color-success: #34eeb6;
-  --color-warning: #ffcf72;
-  --color-error: #ff8863;
+  --color-primary: #2558ff;
+  --color-primary-content: #ffffff;
+  --color-secondary: #1a1a2e;
+  --color-secondary-content: #f0f0f5;
+  --color-accent: #7c3aed;
+  --color-accent-content: #ffffff;
+  --color-neutral: #f0f0f5;
+  --color-neutral-content: #08080d;
+  --color-base-100: #08080d;
+  --color-base-200: #0c0c14;
+  --color-base-300: #14141f;
+  --color-base-content: #f0f0f5;
+  --color-info: #2558ff;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
 
   --radius-field: 9999rem;
   --radius-box: 1rem;
@@ -64,35 +64,22 @@
   --tt-bg: var(--color-primary);
 }
 
-/*
-  Tailwind CSS v4 compatibility: border-color defaults to currentColor.
-  Keep gray-200 as default to match v3 behavior.
-*/
-:root {
-  --bg: #ffffff;
-  --text: #111827;
-  --muted: #5f6b7a;
-  --border: rgba(17, 24, 39, 0.12);
-  --primary-500: #2558ff;
-  --primary-600: #1742d1;
-}
-
 * {
   box-sizing: border-box;
-}
-
-html,
-body {
-  padding: 0;
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
 }
 
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: #08080d;
+  color: #f0f0f5;
 }
 
 body {
@@ -124,7 +111,12 @@ video {
   display: block;
 }
 
-/* Ant Design overrides */
+::selection {
+  background: rgba(37, 88, 255, 0.3);
+  color: #ffffff;
+}
+
+/* Ant Design overrides for docs page */
 .ant-card {
   border-radius: 16px !important;
 }
@@ -143,13 +135,7 @@ video {
 }
 
 .layout-root {
-  background: var(--bg);
-}
-
-/* Selection color */
-::selection {
-  background: rgba(37, 88, 255, 0.15);
-  color: #111827;
+  background: #08080d;
 }
 
 @layer base {

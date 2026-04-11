@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "nextjs",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd /Users/baimurat/Work/notabot/packages/nextjs && ./node_modules/.bin/next dev -p 3333"],
+      "port": 3333
+    }
+  ]
+}
