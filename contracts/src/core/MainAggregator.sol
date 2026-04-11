@@ -86,6 +86,7 @@ contract MainAggregator is IHumanityOracle, Ownable, ReentrancyGuard, Pausable {
         sourceConfidences[1] = SourceConfidence({numerator: 8000, denominator: 8800});
         sourceConfidences[2] = SourceConfidence({numerator: 7000, denominator: 8800});
         sourceConfidences[3] = SourceConfidence({numerator: 7500, denominator: 9000});
+        sourceConfidences[4] = SourceConfidence({numerator: 9700, denominator: 10000});
     }
 
     function registerVerification(
@@ -150,7 +151,7 @@ contract MainAggregator is IHumanityOracle, Ownable, ReentrancyGuard, Pausable {
 
     function addAdapter(address adapter, uint8 sourceId) external onlyOwner {
         if (adapter == address(0)) revert InvalidAddress();
-        require(sourceId <= 3, "Invalid source ID");
+        require(sourceId <= 10, "Invalid source ID");
         isAdapter[adapter] = true;
         adapterToSource[adapter] = sourceId;
         emit AdapterAdded(adapter, sourceId);
