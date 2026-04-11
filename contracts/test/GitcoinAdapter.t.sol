@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "./helpers/Fixtures.sol";
 import "./helpers/ProofFactory.sol";
+import "../src/adapters/OracleAdapter.sol";
 
 contract GitcoinAdapterTest is Fixtures {
 
@@ -32,7 +33,7 @@ contract GitcoinAdapterTest is Fixtures {
     function test_verifyAndRegister_revertProofExpired() public {
         (bytes memory proof,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
         vm.warp(block.timestamp + 2 hours);
-        vm.expectRevert(GitcoinAdapter.ProofExpired.selector);
+        vm.expectRevert(OracleAdapter.ProofExpired.selector);
         gitcoinAdapter.verifyAndRegister(user, proof);
     }
 
@@ -40,14 +41,14 @@ contract GitcoinAdapterTest is Fixtures {
         (bytes memory proof,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
         gitcoinAdapter.verifyAndRegister(user, proof);
 
-        vm.expectRevert(GitcoinAdapter.ProofAlreadyUsed.selector);
+        vm.expectRevert(OracleAdapter.ProofAlreadyUsed.selector);
         gitcoinAdapter.verifyAndRegister(user, proof);
     }
 
     function test_verifyAndRegister_revertInvalidSignature() public {
         uint256 wrongPk = 0xBAD;
         (bytes memory proof,) = ProofFactory.gitcoin(vm, wrongPk, user, 75);
-        vm.expectRevert(GitcoinAdapter.InvalidSignature.selector);
+        vm.expectRevert(OracleAdapter.InvalidSignature.selector);
         gitcoinAdapter.verifyAndRegister(user, proof);
     }
 

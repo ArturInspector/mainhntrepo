@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "./helpers/Fixtures.sol";
 import "./helpers/ProofFactory.sol";
+import "../src/adapters/OracleAdapter.sol";
 
 contract MainAggregatorTest is Fixtures {
 
@@ -37,7 +38,7 @@ contract MainAggregatorTest is Fixtures {
         gitcoinAdapter.verifyAndRegister(user, proof);
 
         bytes memory proof2 = ProofFactory.gitcoinWithId(vm, oraclePk, user2, 75, userId);
-        vm.expectRevert(GitcoinAdapter.ProofAlreadyUsed.selector);
+        vm.expectRevert(OracleAdapter.ProofAlreadyUsed.selector);
         gitcoinAdapter.verifyAndRegister(user2, proof2);
     }
 

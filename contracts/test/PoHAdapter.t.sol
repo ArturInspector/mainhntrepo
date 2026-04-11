@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "./helpers/Fixtures.sol";
 import "./helpers/ProofFactory.sol";
+import "../src/adapters/OracleAdapter.sol";
 
 contract PoHAdapterTest is Fixtures {
 
@@ -17,20 +18,20 @@ contract PoHAdapterTest is Fixtures {
     function test_verifyAndRegister_revertExpired() public {
         (bytes memory proof,) = ProofFactory.poh(vm, oraclePk, user);
         vm.warp(block.timestamp + 2 hours);
-        vm.expectRevert(PoHAdapter.ProofExpired.selector);
+        vm.expectRevert(OracleAdapter.ProofExpired.selector);
         pohAdapter.verifyAndRegister(user, proof);
     }
 
     function test_verifyAndRegister_revertAlreadyUsed() public {
         (bytes memory proof,) = ProofFactory.poh(vm, oraclePk, user);
         pohAdapter.verifyAndRegister(user, proof);
-        vm.expectRevert(PoHAdapter.ProofAlreadyUsed.selector);
+        vm.expectRevert(OracleAdapter.ProofAlreadyUsed.selector);
         pohAdapter.verifyAndRegister(user, proof);
     }
 
     function test_verifyAndRegister_revertInvalidSignature() public {
         (bytes memory proof,) = ProofFactory.poh(vm, 0xBAD, user);
-        vm.expectRevert(PoHAdapter.InvalidSignature.selector);
+        vm.expectRevert(OracleAdapter.InvalidSignature.selector);
         pohAdapter.verifyAndRegister(user, proof);
     }
 

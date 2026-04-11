@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import "./helpers/Fixtures.sol";
 import "./helpers/ProofFactory.sol";
 import "../src/adapters/ConcordiumAdapter.sol";
+import "../src/adapters/OracleAdapter.sol";
 
 contract ConcordiumAdapterTest is Fixtures {
     ConcordiumAdapter internal concordiumAdapter;
@@ -51,7 +52,7 @@ contract ConcordiumAdapterTest is Fixtures {
         bytes memory proof = _concordiumProof(user, accountHash);
 
         vm.warp(block.timestamp + 2 hours);
-        vm.expectRevert(ConcordiumAdapter.ProofExpired.selector);
+        vm.expectRevert(OracleAdapter.ProofExpired.selector);
         concordiumAdapter.verifyAndRegister(user, proof);
     }
 
@@ -61,7 +62,7 @@ contract ConcordiumAdapterTest is Fixtures {
 
         concordiumAdapter.verifyAndRegister(user, proof);
 
-        vm.expectRevert(ConcordiumAdapter.ProofAlreadyUsed.selector);
+        vm.expectRevert(OracleAdapter.ProofAlreadyUsed.selector);
         concordiumAdapter.verifyAndRegister(user, proof);
     }
 
@@ -74,7 +75,7 @@ contract ConcordiumAdapterTest is Fixtures {
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(badPk, digest);
         bytes memory proof = abi.encode(accountHash, timestamp, abi.encodePacked(r, s, v));
 
-        vm.expectRevert(ConcordiumAdapter.InvalidSignature.selector);
+        vm.expectRevert(OracleAdapter.InvalidSignature.selector);
         concordiumAdapter.verifyAndRegister(user, proof);
     }
 
@@ -90,7 +91,7 @@ contract ConcordiumAdapterTest is Fixtures {
         concordiumAdapter.verifyAndRegister(user, proof1);
 
         vm.warp(block.timestamp + 1);
-        vm.expectRevert(ConcordiumAdapter.ProofAlreadyUsed.selector);
+        vm.expectRevert(OracleAdapter.ProofAlreadyUsed.selector);
         bytes memory proof2 = _concordiumProof(user2, accountHash);
         concordiumAdapter.verifyAndRegister(user2, proof2);
     }
