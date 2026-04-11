@@ -1,11 +1,11 @@
 import { ethers } from 'ethers';
 import { logger } from '../utils/logger.js';
 
-const CONCORDIUM_MAINNET_GENESIS = '9dd9ca4d19e9393877d2c44b70f89acbfc0883c2243e5eeaecc0d1cd0503f478';
+const ACCOUNT_REGEX = /^[1-9A-HJ-NP-Za-km-z]{50}$/;
 
 class ConcordiumService {
   isValidAccountAddress(address) {
-    return typeof address === 'string' && /^[1-9A-HJ-NP-Za-km-z]{50}$/.test(address);
+    return typeof address === 'string' && ACCOUNT_REGEX.test(address);
   }
 
   async verifyAccount(concordiumAccount) {
