@@ -2,6 +2,8 @@
 
 import React, { useState, useCallback } from "react";
 import { useAccount, useWriteContract } from "wagmi";
+import { encodeAbiParameters, parseAbiParameters } from "viem";
+import styles from "./ConcordiumVerify.module.css";
 
 const CONCORDIUM_ADAPTER_ABI = [
   {
@@ -34,16 +36,12 @@ export function ConcordiumVerify({
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
 
-  const detectWallet = useCallback((): boolean => {
-    return typeof window !== "undefined" && "concordiumSDK" in window;
-  }, []);
-
   const getConcordiumAccount = useCallback(async (): Promise<string> => {
-    if (!detectWallet()) {
+    if (typeof window === "undefined" || !("concordium" in window)) {
       throw new Error("Concordium Browser Wallet not found. Install it from the Chrome Web Store.");
     }
 
-    const provider = (window as any).concordiumSDK;
+    const provider = (window as any).concordium;
     const accounts: string[] = await provider.requestAccounts();
 
     if (!accounts || accounts.length === 0) {
@@ -51,7 +49,7 @@ export function ConcordiumVerify({
     }
 
     return accounts[0];
-  }, [detectWallet]);
+  }, []);
 
   const handleVerify = useCallback(async () => {
     if (!evmAddress) {
@@ -80,7 +78,10 @@ export function ConcordiumVerify({
 
       const { data } = await response.json();
 
-      const proof = encodeProof(data.concordiumAccountHash, data.timestamp, data.signature);
+      const proof = encodeAbiParameters(
+        parseAbiParameters("bytes32, uint256, bytes"),
+        [data.concordiumAccountHash, BigInt(data.timestamp), data.signature]
+      );
 
       setStep("submitting");
 
@@ -100,20 +101,20 @@ export function ConcordiumVerify({
   }, [evmAddress, getConcordiumAccount, backendUrl, writeContractAsync, concordiumAdapterAddress]);
 
   return (
-    <div className="concordium-verify">
-      <div className="concordium-verify__header">
-        <span className="concordium-verify__badge">CONCORDIUM</span>
-        <span className="concordium-verify__badge concordium-verify__badge--kyc">KYC</span>
+    <div className={styles.concordiumVerify}>
+      <div className={styles.header}>
+        <span className={styles.badge}>CONCORDIUM</span>
+        <span className={`${styles.badge} ${styles.badgeKyc}`}>KYC</span>
       </div>
 
-      <p className="concordium-verify__description">
+      <p className={styles.description}>
         Verify your identity using Concordium&apos;s built-in KYC layer.
         Your personal data is never revealed — only a ZK proof of verification.
       </p>
 
       {step === "idle" && (
         <button
-          className="concordium-verify__btn"
+          className={styles.btn}
           onClick={handleVerify}
           disabled={!evmAddress}
         >
@@ -121,33 +122,23 @@ export function ConcordiumVerify({
         </button>
       )}
 
-      {step === "connecting" && (
-        <div className="concordium-verify__status">
-          Requesting Concordium account...
-        </div>
-      )}
-
-      {step === "signing" && (
-        <div className="concordium-verify__status">
-          Verifying with oracle...
-        </div>
-      )}
-
-      {step === "submitting" && (
-        <div className="concordium-verify__status">
-          Submitting proof on-chain...
+      {(step === "connecting" || step === "signing" || step === "submitting") && (
+        <div className={styles.status}>
+          {step === "connecting" && "Requesting Concordium account..."}
+          {step === "signing" && "Verifying with oracle..."}
+          {step === "submitting" && "Submitting proof on-chain..."}
         </div>
       )}
 
       {step === "done" && (
-        <div className="concordium-verify__success">
+        <div className={styles.success}>
           <span>Verified via Concordium</span>
           {txHash && (
             <a
               href={`https://sepolia.basescan.org/tx/${txHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="concordium-verify__tx"
+              className={styles.tx}
             >
               View tx
             </a>
@@ -156,10 +147,10 @@ export function ConcordiumVerify({
       )}
 
       {step === "error" && (
-        <div className="concordium-verify__error">
+        <div className={styles.errorBox}>
           <span>{error}</span>
           <button
-            className="concordium-verify__btn concordium-verify__btn--retry"
+            className={`${styles.btn} ${styles.btnRetry}`}
             onClick={() => { setStep("idle"); setError(null); }}
           >
             Retry
@@ -168,13 +159,4 @@ export function ConcordiumVerify({
       )}
     </div>
   );
-}
-
-function encodeProof(accountHash: string, timestamp: number, signature: string): `0x${string}` {
-  const { AbiCoder } = require("ethers");
-  const coder = AbiCoder.defaultAbiCoder();
-  return coder.encode(
-    ["bytes32", "uint256", "bytes"],
-    [accountHash, timestamp, signature]
-  ) as `0x${string}`;
 }

@@ -1,4 +1,4 @@
-.concordium-verify {
+.concordiumVerify {
   background: linear-gradient(135deg, rgba(12, 184, 142, 0.08) 0%, rgba(0, 98, 255, 0.05) 100%);
   border: 1px solid rgba(12, 184, 142, 0.25);
   border-radius: 16px;
@@ -8,13 +8,13 @@
   gap: 16px;
 }
 
-.concordium-verify__header {
+.header {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.concordium-verify__badge {
+.badge {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -25,20 +25,20 @@
   border: 1px solid rgba(12, 184, 142, 0.3);
 }
 
-.concordium-verify__badge--kyc {
+.badgeKyc {
   background: rgba(0, 98, 255, 0.12);
   color: #4d8fff;
   border-color: rgba(0, 98, 255, 0.25);
 }
 
-.concordium-verify__description {
+.description {
   font-size: 13px;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.6);
   margin: 0;
 }
 
-.concordium-verify__btn {
+.btn {
   padding: 12px 24px;
   border-radius: 12px;
   background: linear-gradient(135deg, #0cb88e, #0062ff);
@@ -51,21 +51,21 @@
   width: 100%;
 }
 
-.concordium-verify__btn:disabled {
+.btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
-.concordium-verify__btn:not(:disabled):hover {
+.btn:not(:disabled):hover {
   opacity: 0.85;
 }
 
-.concordium-verify__btn--retry {
+.btnRetry {
   background: rgba(255, 255, 255, 0.1);
   margin-top: 8px;
 }
 
-.concordium-verify__status {
+.status {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.5);
   text-align: center;
@@ -78,7 +78,7 @@
   50% { opacity: 1; }
 }
 
-.concordium-verify__success {
+.success {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -91,13 +91,13 @@
   font-weight: 600;
 }
 
-.concordium-verify__tx {
+.tx {
   font-size: 11px;
   color: rgba(12, 184, 142, 0.7);
   text-decoration: underline;
 }
 
-.concordium-verify__error {
+.errorBox {
   display: flex;
   flex-direction: column;
   gap: 8px;
