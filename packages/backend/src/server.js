@@ -5,6 +5,7 @@ import { config } from './config/env.js';
 import { gitcoinService } from './services/gitcoin.js';
 import { pohService } from './services/poh.js';
 import { brightidService } from './services/brightid.js';
+import { concordiumService } from './services/concordium.js';
 import { signerService } from './services/signer.js';
 import { solanaService } from './services/solana.js';
 import { validateAddress, sanitizeError } from './middleware/validators.js';
@@ -423,6 +424,43 @@ app.post('/api/binance/verify', validateAddress, async (req, res) => {
   });
 });
 
+app.post('/api/concordium/verify', validateAddress, async (req, res) => {
+  const { userAddress, concordiumAccount } = req.body;
+
+  try {
+    logger.info('Concordium verification request', { userAddress });
+
+    if (!concordiumAccount) {
+      return res.status(400).json({ error: 'concordiumAccount required', code: 'MISSING_ACCOUNT' });
+    }
+
+    const { accountHash } = await concordiumService.verifyAccount(concordiumAccount);
+
+    const timestamp = Math.floor(Date.now() / 1000);
+    const signature = await signerService.signConcordiumProof(userAddress, accountHash, timestamp);
+
+    logger.info('Concordium verification success', {
+      userAddress,
+      account: concordiumAccount.slice(0, 10) + '...'
+    });
+
+    res.json({
+      success: true,
+      data: {
+        concordiumAccountHash: accountHash,
+        timestamp,
+        signature,
+        expiresAt: timestamp + config.PROOF_VALIDITY_SECONDS,
+        backendAddress: signerService.getAddress()
+      }
+    });
+  } catch (error) {
+    logger.error('Concordium verification failed', { userAddress, error: error.message });
+    const statusCode = error.message.includes('INVALID') ? 400 : 500;
+    res.status(statusCode).json(sanitizeError(error));
+  }
+});
+
 app.listen(config.PORT, () => {
   logger.info(`Server running on port ${config.PORT}`);
   logger.info(`EVM Oracle Address: ${signerService.getAddress()}`);
@@ -432,6 +470,7 @@ app.listen(config.PORT, () => {
   console.log('  POST /api/gitcoin/verify');
   console.log('  POST /api/poh/verify');
   console.log('  POST /api/brightid/verify');
+  console.log('  POST /api/concordium/verify');
   console.log('  POST /api/solana/verify');
   console.log('  GET  /api/solana/check/:userPublicKey');
   if (config.DEMO_MODE) {
