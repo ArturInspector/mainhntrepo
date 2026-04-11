@@ -7,11 +7,11 @@ export default function NotFoundPage() {
   return (
     <Result
       status="404"
-      title="Страница не найдена (404)"
-      subTitle="Похоже, вы зашли не туда!"
+      title="Page not found"
+      subTitle="The page you requested does not exist."
       extra={
         <Link href={"/"}>
-          <Button type="primary">Вернуться на главную</Button>
+          <Button type="primary">Back to home</Button>
         </Link>
       }
     />
