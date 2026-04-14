@@ -1,9 +1,9 @@
 <div align="center">
 
-# 🤖 NotABot
+# NotABot (aren't you?)
 
 ### "Stripe for Web3 Identity"
-https://mainhntrepo-nextjs-uurk.vercel.app/
+https://notabot.online
 
 **Universal Multi-Chain Proof-of-Humanity Protocol**  
 Verify once on ANY chain → Access everywhere
@@ -17,7 +17,7 @@ Verify once on ANY chain → Access everywhere
 [![Tests](https://img.shields.io/badge/Tests-26%2F26%20passing-brightgreen)](./packages/hardhat/test)
 [![CI](https://img.shields.io/badge/CI-Passing-brightgreen)](./.github/workflows/ci.yml)
 
-**🏆 ETH Bishkek 2024 Winners** | Now Expanding to Solana
+**🏆 ETH Bishkek 2025 Winners** 
 
 [🏗️ Architecture](./docs/ARCHITECTURE.md) • [📡 API Docs](./packages/backend/API.md) • [⚡ Solana Docs](./solana/ARCHITECTURE.md) • [🚀 Roadmap](./docs/4STEPSPROD.MD) • [🤝 Contributing](./CONTRIBUTING.md)
 
@@ -25,7 +25,7 @@ Verify once on ANY chain → Access everywhere
 
 ---
 
-## 🌐 Multi-Chain Expansion
+## Multi-Chain Expansion
 
 **We won ETH Bishkek with Base L2 deployment. Now we're going everywhere.**
 
@@ -79,7 +79,7 @@ Each verification gives users 1 HMT token. More verifications = higher trust sco
 
 ---
 
-## 🚀 Quick Start
+## Local start (developers are welcomed)
 
 ### Prerequisites
 - Node.js >= 20.18.3

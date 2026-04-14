@@ -74,7 +74,7 @@ export default function Docs() {
       >
         <div className={styles.brand}>
           <div className={styles.brandTitle}>NotABot Docs</div>
-          <div className={styles.brandSub}>Sybil-resistant contracts</div>
+          <div className={styles.brandSub}>Identity Oracle for Web3</div>
         </div>
         <Menu
           theme="dark"
@@ -100,15 +100,16 @@ export default function Docs() {
                         NotABot Integration Guide
                       </Title>
                       <Paragraph className={styles.lead}>
-                        Like OpenZeppelin, but for sybil resistance. Copy HumanityProtected mixin from GitHub, 
-                        add onlyHuman modifier, protect your contracts from bots. 
-                        Aggregates Worldcoin, Gitcoin Passport, BrightID on multiple chains.
+                        Integrate a human check with one contract call.
+                        NotABot aggregates Worldcoin, Gitcoin Passport, PoH,
+                        and BrightID behind a stable oracle interface for DEXes,
+                        L1/L2 chains, and dApps.
                       </Paragraph>
                       <Space wrap>
-                        <Tag className={styles.tagPrimary}>Status Network</Tag>
                         <Tag className={styles.tagPrimary}>Base Sepolia</Tag>
-                        <Tag className={styles.tagSoft}>Abstract Mixin</Tag>
-                        <Tag className={styles.tagMono}>git clone</Tag>
+                        <Tag className={styles.tagPrimary}>Status Sepolia</Tag>
+                        <Tag className={styles.tagSoft}>View-only oracle</Tag>
+                        <Tag className={styles.tagMono}>One contract call</Tag>
                       </Space>
                       <div className={styles.ctaRow}>
                         <Link href="#quickstart">
@@ -145,7 +146,7 @@ export default function Docs() {
                         1. Clone & Copy
                       </Title>
                       <pre className={styles.code}>
-                        <code>{`git clone https://github.com/your/repo
+                        <code>{`git clone https://github.com/ArturInspector/notabot.git
 cp packages/hardhat/contracts/base/HumanityProtected.sol .
 cp packages/hardhat/contracts/interfaces/IHumanityOracle.sol .`}</code>
                       </pre>
