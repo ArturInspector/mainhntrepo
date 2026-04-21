@@ -1,48 +1,50 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import "../interfaces/IVerificationAdapter.sol";
+import "../interfaces/IEAS.sol";
 import "../core/MainAggregator.sol";
 
+/// Schema: abi.encode(bytes32 uniqueId, uint256 qualityScore)
 abstract contract OracleAdapter is IVerificationAdapter {
-    using ECDSA for bytes32;
-    using MessageHashUtils for bytes32;
-
+    IEAS public immutable eas;
     MainAggregator public immutable mainAggregator;
     address public immutable backendOracle;
+    bytes32 public immutable schemaUID;
 
-    uint256 public constant PROOF_VALIDITY = 1 hours;
+    mapping(bytes32 => bool) public usedAttestations;
 
-    mapping(bytes32 => bool) public usedProofs;
+    error AttestationNotFound();
+    error AttestationAlreadyUsed();
+    error AttestationExpired();
+    error AttestationRevoked();
+    error InvalidAttester();
+    error InvalidRecipient();
+    error InvalidSchema();
 
-    error InvalidSignature();
-    error ProofExpired();
-    error ProofAlreadyUsed();
-
-    constructor(address _mainAggregator, address _backendOracle) {
+    constructor(address _eas, bytes32 _schemaUID, address _mainAggregator, address _backendOracle) {
+        eas = IEAS(_eas);
+        schemaUID = _schemaUID;
         mainAggregator = MainAggregator(_mainAggregator);
         backendOracle = _backendOracle;
     }
 
-    function _useProof(bytes32 id, uint256 timestamp, address user, bytes memory signature) internal {
-        if (block.timestamp > timestamp + PROOF_VALIDITY) revert ProofExpired();
-        if (usedProofs[id]) revert ProofAlreadyUsed();
+    function _consumeAttestation(bytes32 uid, address expectedRecipient)
+        internal
+        returns (bytes32 uniqueId, uint256 qualityScore)
+    {
+        if (usedAttestations[uid]) revert AttestationAlreadyUsed();
 
-        bytes32 digest = keccak256(abi.encodePacked(user, id, timestamp)).toEthSignedMessageHash();
-        if (digest.recover(signature) != backendOracle) revert InvalidSignature();
+        IEAS.Attestation memory att = eas.getAttestation(uid);
 
-        usedProofs[id] = true;
-    }
+        if (att.uid == bytes32(0)) revert AttestationNotFound();
+        if (att.schema != schemaUID) revert InvalidSchema();
+        if (att.attester != backendOracle) revert InvalidAttester();
+        if (att.recipient != expectedRecipient) revert InvalidRecipient();
+        if (att.revocationTime != 0) revert AttestationRevoked();
+        if (att.expirationTime != 0 && block.timestamp > att.expirationTime) revert AttestationExpired();
 
-    function _useProofWithScore(bytes32 id, uint256 score, uint256 timestamp, address user, bytes memory signature) internal {
-        if (block.timestamp > timestamp + PROOF_VALIDITY) revert ProofExpired();
-        if (usedProofs[id]) revert ProofAlreadyUsed();
-
-        bytes32 digest = keccak256(abi.encodePacked(user, id, score, timestamp)).toEthSignedMessageHash();
-        if (digest.recover(signature) != backendOracle) revert InvalidSignature();
-
-        usedProofs[id] = true;
+        usedAttestations[uid] = true;
+        (uniqueId, qualityScore) = abi.decode(att.data, (bytes32, uint256));
     }
 }
