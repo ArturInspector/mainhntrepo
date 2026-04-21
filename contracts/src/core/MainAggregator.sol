@@ -250,7 +250,7 @@ contract MainAggregator is IHumanityOracle, Ownable, ReentrancyGuard, Pausable {
         updateSourceConfidence(sourceId);
     }
 
-    function updateSourceConfidence(uint8 sourceId) public {
+    function updateSourceConfidence(uint8 sourceId) internal {
         SourceStats memory stats = sourceStats[sourceId];
         if (stats.totalVerifications == 0) return;
         uint256 newFPR = (stats.confirmedAttacks * 10000) / stats.totalVerifications;

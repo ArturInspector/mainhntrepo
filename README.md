@@ -1,311 +1,138 @@
-<div align="center">
+# NotABot
 
-# NotABot (aren't you?)
+**On-chain proof-of-humanity oracle for EVM chains.**
 
-### "Stripe for Web3 Identity"
-https://notabot.online
-
-**Universal Multi-Chain Proof-of-Humanity Protocol**  
-Verify once on ANY chain → Access everywhere
-
-[![Solidity](https://img.shields.io/badge/Solidity-^0.8.20-363636?logo=solidity)](https://soliditylang.org)
-[![Rust](https://img.shields.io/badge/Rust-Anchor-orange?logo=rust)](https://www.rust-lang.org)
-[![Base L2](https://img.shields.io/badge/Network-Base%20Sepolia-0052FF)](https://base.org)
-[![Solana](https://img.shields.io/badge/Network-Solana%20Devnet-9945FF)](https://solana.com)
-[![Status Network](https://img.shields.io/badge/Network-Status%20Testnet-5B6CD9)](https://status.network)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-26%2F26%20passing-brightgreen)](./packages/hardhat/test)
-[![CI](https://img.shields.io/badge/CI-Passing-brightgreen)](./.github/workflows/ci.yml)
-
-**🏆 ETH Bishkek 2025 Winners** 
-
-[🏗️ Architecture](./docs/ARCHITECTURE.md) • [📡 API Docs](./packages/backend/API.md) • [⚡ Solana Docs](./solana/ARCHITECTURE.md) • [🚀 Roadmap](./docs/4STEPSPROD.MD) • [🤝 Contributing](./CONTRIBUTING.md)
-
-</div>
-
----
-
-## Multi-Chain Expansion
-
-**We won ETH Bishkek with Base L2 deployment. Now we're going everywhere.**
-
-| Blockchain | Status | Why It Matters |
-|------------|--------|----------------|
-| **Base L2** | ✅ Deployed | EVM DeFi ecosystem |
-| **Status Network** | ✅ Deployed | Privacy-focused L2 |
-| **Solana** | 🚧 Deploying | GameFi + 65k TPS |
-| Ethereum | 🔜 Q2 2025 | Maximum security |
-| Optimism | 🔜 Q2 2025 | Superchain bridge |
-| Arbitrum | 🔜 Q2 2025 | Largest L2 |
-
-**Vision:** Become THE identity layer for ALL of Web3, not just one chain.
-
----
-
-## The Problem
-
-Airdrops are getting destroyed by bots. 60-90% of participants aren't real humans. Arbitrum lost $50M+ in 2023 alone.
-
-**Solana's Problem is WORSE:**
-- Transactions cost $0.00025 (vs $2+ on Ethereum)
-- Creating 10,000 fake wallets = $2.50 total
-- Every Solana airdrop gets farmed to death
-- GameFi projects can't prevent multi-accounting
-
-Existing solutions are fragmented:
-- Worldcoin requires physical orb access
-- Gitcoin Passport needs manual stamp collection  
-- Proof of Humanity has high friction
-- Every project integrates these separately (2-4 weeks each)
-- **NONE work across multiple chains**
-
-## Our Solution
-
-One contract. Multiple verification sources. Zero complexity.
+Aggregates multiple identity sources into a single interface. One call to determine whether an address belongs to a verified human.
 
 ```solidity
-// Your dApp code:
-bool isHuman = IHumanityOracle(AGGREGATOR).isVerifiedHuman(user);
+bool isHuman = IHumanityOracle(AGGREGATOR).isVerifiedHuman(msg.sender);
+uint256 score  = IHumanityOracle(AGGREGATOR).getTrustScore(msg.sender); // 0–100
 ```
 
-Supports:
-- Worldcoin (ZK biometric proof)
-- Gitcoin Passport (reputation score)
-- Proof of Humanity (video verification)
-- BrightID (social graph)
-- Binance KYC (coming soon)
-
-Each verification gives users 1 HMT token. More verifications = higher trust score.
-
----
-
-## Local start (developers are welcomed)
-
-### Prerequisites
-- Node.js >= 20.18.3
-- Yarn
-- Metamask
-
-### Installation
-
-```bash
-git clone https://github.com/your-org/notabot.git
-cd notabot
-yarn install
-```
-
-### Local Development
-
-```bash
-# Terminal 1: Start local blockchain
-yarn chain
-
-# Terminal 2: Deploy contracts
-yarn deploy
-
-# Terminal 3: Start frontend
-yarn start
-```
-
-Visit `http://localhost:3000`
-
-**Debug UI:** `http://localhost:3000/debug` (interact with contracts)
+[![Solidity](https://img.shields.io/badge/Solidity-^0.8.20-363636?logo=solidity)](https://soliditylang.org)
+[![Base L2](https://img.shields.io/badge/Network-Base%20Sepolia-0052FF)](https://base.org)
+[![Status Network](https://img.shields.io/badge/Network-Status%20Testnet-5B6CD9)](https://status.network)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENCE)
+[![Tests](https://img.shields.io/badge/Tests-26%2F26%20passing-brightgreen)](./contracts/test)
 
 ---
 
 ## Architecture
 
-**Core Contracts (Base Sepolia + Status Network)**
+```
+User → Adapter (verify proof) → MainAggregator (register + score) → HMT reward
+```
+
+**Verification sources**
+
+| Source | ID | Confidence | Notes |
+|---|---|---|---|
+| Worldcoin | 0 | 99.5% | ZK biometric proof via World ID |
+| Gitcoin Passport | 1 | ~91% | Score-weighted, adjusts dynamically |
+| Proof of Humanity | 2 | 79.5% | Video-verified identity |
+| BrightID | 3 | 83.3% | Social graph |
+| Concordium | 4 | 97% | On-chain regulated KYC |
+
+Trust score uses Bayesian combination — multiple sources compound, not add.
+
+**Contracts (Base Sepolia + Status Network)**
 
 | Contract | Address |
-|----------|---------|
+|---|---|
 | MainAggregator | `0xFcB998E4c6A0157dEF6AC724Da1279aA6Ac2743D` |
 | VerificationToken (HMT) | `0x9f12107874B1ED8B10AED87e19E4BDf5ea17a45B` |
 | GitcoinAdapter | `0xCd52fb37d7Ff8d164fB49274E7fd8e2b81b5710b` |
 | PoHAdapter | `0xc2fF5af5C12B7085dC49415Cb81e29B8524E06C0` |
 | BrightIDAdapter | `0xAeCEbf9B937D1B36C2ed5D2C2190673eA3CC82de` |
 
-**How it works:**
-```
-User → Adapter verifies proof → MainAggregator registers → Mints 1 HMT token
-```
-
-See detailed diagrams: [ARCHITECTURE_DIAGRAM.md](./ARCHITECTURE_DIAGRAM.md)
-
 ---
 
-## 📋 Usage Examples
+## Integration
 
-### For dApp Developers
-
-**1. Check if user is verified:**
 ```solidity
-import "@notabot/contracts/IHumanityOracle.sol";
+import { IHumanityOracle } from "@notabot/contracts/interfaces/IHumanityOracle.sol";
 
-contract MyGameFi {
-    IHumanityOracle oracle = IHumanityOracle(0x...);
-    
-    function claimAirdrop() external {
-        require(oracle.isVerifiedHuman(msg.sender), "Humans only");
-        // Your logic here
+contract MyProtocol {
+    IHumanityOracle immutable oracle;
+
+    constructor(address _oracle) { oracle = IHumanityOracle(_oracle); }
+
+    modifier onlyHuman() {
+        require(oracle.isVerifiedHuman(msg.sender), "not verified");
+        _;
     }
 }
 ```
 
-**2. Get user's trust score:**
-```solidity
-uint256 score = oracle.getTrustScore(msg.sender);
-require(score >= 10, "Insufficient trust score");
+Or use the `HumanityProtected` base contract — it ships `onlyHuman` and `minTrustScore(n)` modifiers.
+
+---
+
+## Local development
+
+**Prerequisites:** Node.js ≥ 20, Yarn, Foundry
+
+```bash
+git clone https://github.com/ArturInspector/notabot
+cd notabot
+yarn install
 ```
 
-### For Frontend Developers
+```bash
+# Terminal 1 — local chain
+yarn chain
 
-```typescript
-import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+# Terminal 2 — deploy contracts
+yarn deploy
 
-// Check verification status
-const { data: isVerified } = useScaffoldReadContract({
-  contractName: "MainAggregator",
-  functionName: "isVerifiedHuman",
-  args: [address]
-});
+# Terminal 3 — frontend
+yarn start
+```
 
-// Verify with Worldcoin
-const { writeAsync: verifyWorldcoin } = useScaffoldWriteContract({
-  contractName: "WorldcoinAdapter",
-  functionName: "verifyAndRegister"
-});
+**Contract tests (Foundry)**
+
+```bash
+cd contracts
+forge test
+```
+
+**Backend oracle**
+
+```bash
+cd packages/backend
+cp .env.example .env   # set ORACLE_PRIVATE_KEY and API keys
+yarn dev
 ```
 
 ---
 
-## Live Demo
+## Repository layout
 
-**Backend API:** https://mainhntrepo-production.up.railway.app
-
-**Test it:**
-```bash
-curl -X POST https://mainhntrepo-production.up.railway.app/api/demo/verify \
-  -H "Content-Type: application/json" \
-  -d '{"userAddress": "0xYOUR_ADDRESS", "source": "gitcoin"}'
 ```
-
-**How it works:**
-1. Connect wallet, pick verification source
-2. Backend signs your proof
-3. Submit to contract → get 1 HMT token
-4. Now you're verified on-chain
+contracts/          Foundry — canonical contracts and tests
+packages/
+  nextjs/           Frontend (Next.js 15, wagmi, viem, RainbowKit)
+  hardhat/          Hardhat — deploy scripts, scaffold-eth integration
+  backend/          Oracle backend (Node.js, Express)
+solana/             ⚠️  FROZEN — Anchor program, not actively maintained
+docs/               Architecture and integration docs
+```
 
 ---
 
 ## Security
 
-- Duplicate prevention via `usedUniqueIds` mapping
-- Timestamp expiry (1 hour max)
-- ECDSA signature verification
-- OpenZeppelin contracts (ReentrancyGuard, Pausable)
-- CEI pattern everywhere
+- Proof replay prevention via `usedUniqueIds`
+- 1-hour proof expiry enforced on-chain
+- ECDSA backend oracle signatures
+- Source compromise windows with selective invalidation
+- OpenZeppelin: ReentrancyGuard, Pausable, Ownable
+- CEI pattern throughout
 
-See [SAFE.MD](./SAFE.MD) for details.
-
----
-
-## 🎯 Roadmap
-
-### ✅ Hackathon MVP (Done!)
-- ✅ Core contracts deployed on Base Sepolia
-- ✅ 4 adapters: Worldcoin, Gitcoin, PoH, BrightID
-- ✅ Backend API with demo mode
-- ✅ Integration guide (5 minutes)
-- ✅ 26/26 tests passing
-
-### 🔜 Post-Hackathon (1 month)
-- Mainnet launch (Base L2)
-- Real Worldcoin/PoH/BrightID integrations (remove demo mode)
-- First 5 dApp partnerships
-- Security audit
-
-### 🚀 Long-term Vision
-- Binance/Coinbase KYC adapters
-- Cross-chain SBT (Hyperlane/LayerZero)
-- SaaS model ($99/month for dApps)
-- Become standard for Web3 identity
+See [SECURITY.md](./SECURITY.md) for disclosure policy.
 
 ---
 
-## 🛠️ Tech Stack
+## License
 
-**Smart Contracts:**
-- Solidity ^0.8.20
-- Hardhat (testing + deployment)
-- OpenZeppelin Contracts v5.x
-- Base L2 (target: <$0.01/tx)
-
-**Frontend:**
-- Next.js 15 + TypeScript
-- Scaffold-ETH 2 (wagmi + viem + RainbowKit)
-- TailwindCSS + DaisyUI + Antd design
-
-**Backend (Gitcoin):**
-- Node.js + Express
-- Gitcoin Passport API
-- ECDSA signing (ethers.js)
-
----
-
-## 📚 Documentation
-
-- **[5-Minute Integration Guide](./docs/INTEGRATION.md)** ← Start here!
-- [Architecture Overview](./docs/ARCHITECTURE.md)
-- [Production Roadmap](./docs/4STEPSPROD.MD)
-- [Honest Analysis](./docs/HONEST_ANALYSIS.md) - What needs improvement
-- [Backend API Reference](./packages/backend/API.md)
-- [Demo Script](./docs/DEMO_SCRIPT.md)
-- [Security Design](./SAFE.MD)
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
-
-**Key Areas:**
-- 🆕 New verification adapters
-- 🎨 Frontend UI improvements
-- 🔒 Security audits
-- 📚 Documentation
-- 🧪 Test coverage
-
-**Contributors:** See [CONTRIBUTORS.md](./CONTRIBUTORS.md) for the full list.
-
-**Found a security issue?** See [SECURITY.md](./SECURITY.md) for responsible disclosure.
-
----
-
-## 📄 License
-
-MIT License - see [LICENSE](./LICENSE)
-
----
-
-## 🏆 Built with Scaffold-ETH 2
-
-This project was bootstrapped with [Scaffold-ETH 2](https://scaffoldeth.io).
-
-**Sponsors:** BuidlGuidl
-
----
-
-<div align="center">
-
-**TL;DR:** Verify once → Access everywhere. 5-minute integration for dApps.
-
-### 🏆 Built for ETHGlobal Hackathon 2025
-
-**Live on Base Sepolia** • **4 Verification Sources** • **26/26 Tests Passing**
-
-[Try Demo](#) • [Integration Guide](./INTEGRATION.md) • [Watch Video](#)
-
-Made with ❤️ for Web3
-
-</div>
+MIT
