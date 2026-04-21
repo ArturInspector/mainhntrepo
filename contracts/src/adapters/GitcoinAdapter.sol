@@ -10,17 +10,19 @@ contract GitcoinAdapter is OracleAdapter {
 
     event GitcoinVerified(address indexed user, uint256 score, bytes32 userId);
 
-    constructor(address _mainAggregator, address _backendOracle)
-        OracleAdapter(_mainAggregator, _backendOracle) {}
+    constructor(address _eas, bytes32 _schemaUID, address _mainAggregator, address _backendOracle)
+        OracleAdapter(_eas, _schemaUID, _mainAggregator, _backendOracle) {}
 
     function verifyAndRegister(address user, bytes calldata proof) external {
-        (bytes32 userId, uint256 score, uint256 timestamp, bytes memory signature) =
-            abi.decode(proof, (bytes32, uint256, uint256, bytes));
+        bytes32 uid = abi.decode(proof, (bytes32));
+        (bytes32 userId, uint256 score) = _consumeAttestation(uid, user);
 
         if (score < MIN_SCORE) revert ScoreTooLow();
-        _useProofWithScore(userId, score, timestamp, user, signature);
 
-        mainAggregator.registerVerification(user, 1, userId, proof);
+        // MainAggregator extracts score from source==1 proof as (bytes32, uint256, uint256, bytes)
+        mainAggregator.registerVerification(user, 1, userId,
+            abi.encode(userId, score, uint256(0), bytes("")));
+
         emit GitcoinVerified(user, score, userId);
     }
 

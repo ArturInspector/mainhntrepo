@@ -6,14 +6,12 @@ import "./OracleAdapter.sol";
 contract BrightIDAdapter is OracleAdapter {
     event BrightIDVerified(address indexed user, bytes32 contextId);
 
-    constructor(address _mainAggregator, address _backendOracle)
-        OracleAdapter(_mainAggregator, _backendOracle) {}
+    constructor(address _eas, bytes32 _schemaUID, address _mainAggregator, address _backendOracle)
+        OracleAdapter(_eas, _schemaUID, _mainAggregator, _backendOracle) {}
 
     function verifyAndRegister(address user, bytes calldata proof) external {
-        (bytes32 contextId, uint256 timestamp, bytes memory signature) =
-            abi.decode(proof, (bytes32, uint256, bytes));
-
-        _useProof(contextId, timestamp, user, signature);
+        bytes32 uid = abi.decode(proof, (bytes32));
+        (bytes32 contextId,) = _consumeAttestation(uid, user);
 
         mainAggregator.registerVerification(user, 3, contextId, proof);
         emit BrightIDVerified(user, contextId);

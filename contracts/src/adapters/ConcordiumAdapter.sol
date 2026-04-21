@@ -8,15 +8,14 @@ contract ConcordiumAdapter is OracleAdapter {
 
     event ConcordiumVerified(address indexed evmUser, bytes32 concordiumAccountHash);
 
-    constructor(address _mainAggregator, address _backendOracle)
-        OracleAdapter(_mainAggregator, _backendOracle) {}
+    constructor(address _eas, bytes32 _schemaUID, address _mainAggregator, address _backendOracle)
+        OracleAdapter(_eas, _schemaUID, _mainAggregator, _backendOracle) {}
 
     function verifyAndRegister(address user, bytes calldata proof) external {
-        (bytes32 concordiumAccountHash, uint256 timestamp, bytes memory signature) =
-            abi.decode(proof, (bytes32, uint256, bytes));
+        bytes32 uid = abi.decode(proof, (bytes32));
+        (bytes32 concordiumAccountHash,) = _consumeAttestation(uid, user);
 
         if (concordiumAccountHash == bytes32(0)) revert InvalidConcordiumAccount();
-        _useProof(concordiumAccountHash, timestamp, user, signature);
 
         mainAggregator.registerVerification(user, 4, concordiumAccountHash, proof);
         emit ConcordiumVerified(user, concordiumAccountHash);
