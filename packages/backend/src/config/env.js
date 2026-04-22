@@ -3,8 +3,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 const REQUIRED_VARS = [
   'BACKEND_PRIVATE_KEY',
-  'GITCOIN_API_KEY', 
-  'GITCOIN_SCORER_ID'
+  'GITCOIN_API_KEY',
+  'GITCOIN_SCORER_ID',
+  'EVM_RPC_URL',
+  'EAS_ADDRESS',
+  'EAS_SCHEMA_UID',
 ];
 
 
@@ -24,7 +27,11 @@ export const config = {
     : ['http://localhost:3000', 'http://localhost:3001'],
   
   BACKEND_PRIVATE_KEY: process.env.BACKEND_PRIVATE_KEY,
-  
+
+  EVM_RPC_URL: process.env.EVM_RPC_URL,
+  EAS_ADDRESS: process.env.EAS_ADDRESS,
+  EAS_SCHEMA_UID: process.env.EAS_SCHEMA_UID,
+
   SOLANA_RPC_URL: process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com',
   SOLANA_PROGRAM_ID: process.env.SOLANA_PROGRAM_ID || 'B2SGdLXWxVssPDBHB8WwKwhwdP9CLWDvBfXr1EtYZtye',
   SOLANA_ORACLE_PRIVATE_KEY: process.env.SOLANA_ORACLE_PRIVATE_KEY,
