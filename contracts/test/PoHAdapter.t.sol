@@ -8,7 +8,7 @@ import "../src/adapters/OracleAdapter.sol";
 contract PoHAdapterTest is Fixtures {
 
     function test_verifyAndRegister_success() public {
-        (bytes memory proof,) = ProofFactory.poh(vm, oraclePk, user);
+        (bytes memory proof,) = ProofFactory.poh(mockEAS, oracle, schemaUID, user);
         pohAdapter.verifyAndRegister(user, proof);
 
         assertTrue(aggregator.isVerifiedHuman(user));
@@ -16,22 +16,30 @@ contract PoHAdapterTest is Fixtures {
     }
 
     function test_verifyAndRegister_revertExpired() public {
-        (bytes memory proof,) = ProofFactory.poh(vm, oraclePk, user);
+        (bytes memory proof,) = ProofFactory.poh(mockEAS, oracle, schemaUID, user);
         vm.warp(block.timestamp + 2 hours);
-        vm.expectRevert(OracleAdapter.ProofExpired.selector);
+        vm.expectRevert(OracleAdapter.AttestationExpired.selector);
         pohAdapter.verifyAndRegister(user, proof);
     }
 
     function test_verifyAndRegister_revertAlreadyUsed() public {
-        (bytes memory proof,) = ProofFactory.poh(vm, oraclePk, user);
+        (bytes memory proof,) = ProofFactory.poh(mockEAS, oracle, schemaUID, user);
         pohAdapter.verifyAndRegister(user, proof);
-        vm.expectRevert(OracleAdapter.ProofAlreadyUsed.selector);
+        vm.expectRevert(OracleAdapter.AttestationAlreadyUsed.selector);
         pohAdapter.verifyAndRegister(user, proof);
     }
 
-    function test_verifyAndRegister_revertInvalidSignature() public {
-        (bytes memory proof,) = ProofFactory.poh(vm, 0xBAD, user);
-        vm.expectRevert(OracleAdapter.InvalidSignature.selector);
+    function test_verifyAndRegister_revertInvalidAttester() public {
+        address wrongOracle = makeAddr("wrongOracle");
+        (bytes memory proof,) = ProofFactory.poh(mockEAS, wrongOracle, schemaUID, user);
+        vm.expectRevert(OracleAdapter.InvalidAttester.selector);
+        pohAdapter.verifyAndRegister(user, proof);
+    }
+
+    function test_verifyAndRegister_revertRevoked() public {
+        (bytes memory proof,) = ProofFactory.poh(mockEAS, oracle, schemaUID, user);
+        mockEAS.revoke(abi.decode(proof, (bytes32)));
+        vm.expectRevert(OracleAdapter.AttestationRevoked.selector);
         pohAdapter.verifyAndRegister(user, proof);
     }
 

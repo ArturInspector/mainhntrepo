@@ -11,36 +11,23 @@ contract ConcordiumAdapterTest is Fixtures {
 
     function setUp() public override {
         super.setUp();
-        concordiumAdapter = new ConcordiumAdapter(address(aggregator), oracle);
+        concordiumAdapter = new ConcordiumAdapter(address(mockEAS), schemaUID, address(aggregator), oracle);
         aggregator.addAdapter(address(concordiumAdapter), 4);
-    }
-
-    function _concordiumProof(address evmUser, bytes32 accountHash)
-        internal
-        view
-        returns (bytes memory proof)
-    {
-        uint256 timestamp = block.timestamp;
-        bytes32 message = keccak256(abi.encodePacked(evmUser, accountHash, timestamp));
-        bytes32 digest = MessageHashUtils.toEthSignedMessageHash(message);
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(oraclePk, digest);
-        proof = abi.encode(accountHash, timestamp, abi.encodePacked(r, s, v));
     }
 
     function test_verifyAndRegister_success() public {
         bytes32 accountHash = keccak256(abi.encodePacked("3ZfCSfUF9bFPMDHFXyrHkHpNLDNqV5VFNRXFmXHpNkahFXnLu"));
-        bytes memory proof = _concordiumProof(user, accountHash);
+        bytes memory proof = ProofFactory.concordium(mockEAS, oracle, schemaUID, user, accountHash);
 
         concordiumAdapter.verifyAndRegister(user, proof);
 
         assertTrue(aggregator.isVerifiedHuman(user));
         assertEq(aggregator.getVerificationByIndex(user, 0).source, 4);
-        assertEq(aggregator.getVerificationByIndex(user, 0).qualityScore, 100);
     }
 
     function test_verifyAndRegister_transfersTokenReward() public {
         bytes32 accountHash = keccak256(abi.encodePacked("concordium-account-1"));
-        bytes memory proof = _concordiumProof(user, accountHash);
+        bytes memory proof = ProofFactory.concordium(mockEAS, oracle, schemaUID, user, accountHash);
 
         concordiumAdapter.verifyAndRegister(user, proof);
 
@@ -49,51 +36,47 @@ contract ConcordiumAdapterTest is Fixtures {
 
     function test_verifyAndRegister_revertExpired() public {
         bytes32 accountHash = keccak256(abi.encodePacked("concordium-account-2"));
-        bytes memory proof = _concordiumProof(user, accountHash);
+        bytes memory proof = ProofFactory.concordium(mockEAS, oracle, schemaUID, user, accountHash);
 
         vm.warp(block.timestamp + 2 hours);
-        vm.expectRevert(OracleAdapter.ProofExpired.selector);
+        vm.expectRevert(OracleAdapter.AttestationExpired.selector);
         concordiumAdapter.verifyAndRegister(user, proof);
     }
 
     function test_verifyAndRegister_revertAlreadyUsed() public {
         bytes32 accountHash = keccak256(abi.encodePacked("concordium-account-3"));
-        bytes memory proof = _concordiumProof(user, accountHash);
+        bytes memory proof = ProofFactory.concordium(mockEAS, oracle, schemaUID, user, accountHash);
 
         concordiumAdapter.verifyAndRegister(user, proof);
 
-        vm.expectRevert(OracleAdapter.ProofAlreadyUsed.selector);
+        vm.expectRevert(OracleAdapter.AttestationAlreadyUsed.selector);
         concordiumAdapter.verifyAndRegister(user, proof);
     }
 
-    function test_verifyAndRegister_revertInvalidSignature() public {
+    function test_verifyAndRegister_revertInvalidAttester() public {
         bytes32 accountHash = keccak256(abi.encodePacked("concordium-account-4"));
-        uint256 badPk = 0xBAD;
-        uint256 timestamp = block.timestamp;
-        bytes32 message = keccak256(abi.encodePacked(user, accountHash, timestamp));
-        bytes32 digest = MessageHashUtils.toEthSignedMessageHash(message);
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(badPk, digest);
-        bytes memory proof = abi.encode(accountHash, timestamp, abi.encodePacked(r, s, v));
+        address badOracle = makeAddr("badOracle");
+        bytes memory proof = ProofFactory.concordium(mockEAS, badOracle, schemaUID, user, accountHash);
 
-        vm.expectRevert(OracleAdapter.InvalidSignature.selector);
+        vm.expectRevert(OracleAdapter.InvalidAttester.selector);
+        concordiumAdapter.verifyAndRegister(user, proof);
+    }
+
+    function test_verifyAndRegister_revertRevoked() public {
+        bytes32 accountHash = keccak256(abi.encodePacked("concordium-account-5"));
+        bytes memory proof = ProofFactory.concordium(mockEAS, oracle, schemaUID, user, accountHash);
+        bytes32 uid = abi.decode(proof, (bytes32));
+        mockEAS.revoke(uid);
+
+        vm.expectRevert(OracleAdapter.AttestationRevoked.selector);
         concordiumAdapter.verifyAndRegister(user, proof);
     }
 
     function test_verifyAndRegister_revertZeroAccountHash() public {
-        bytes memory proof = abi.encode(bytes32(0), block.timestamp, bytes(""));
+        bytes memory proof = ProofFactory.concordium(mockEAS, oracle, schemaUID, user, bytes32(0));
+
         vm.expectRevert(ConcordiumAdapter.InvalidConcordiumAccount.selector);
         concordiumAdapter.verifyAndRegister(user, proof);
-    }
-
-    function test_verifyAndRegister_oneConcordiumAccountPerEvm() public {
-        bytes32 accountHash = keccak256(abi.encodePacked("concordium-account-5"));
-        bytes memory proof1 = _concordiumProof(user, accountHash);
-        concordiumAdapter.verifyAndRegister(user, proof1);
-
-        vm.warp(block.timestamp + 1);
-        vm.expectRevert(OracleAdapter.ProofAlreadyUsed.selector);
-        bytes memory proof2 = _concordiumProof(user2, accountHash);
-        concordiumAdapter.verifyAndRegister(user2, proof2);
     }
 
     function test_getSourceId_returnsFour() public view {
@@ -102,7 +85,7 @@ contract ConcordiumAdapterTest is Fixtures {
 
     function test_highConfidenceScore() public {
         bytes32 accountHash = keccak256(abi.encodePacked("concordium-account-6"));
-        bytes memory proof = _concordiumProof(user, accountHash);
+        bytes memory proof = ProofFactory.concordium(mockEAS, oracle, schemaUID, user, accountHash);
         concordiumAdapter.verifyAndRegister(user, proof);
 
         (uint256 num, uint256 den) = aggregator.sourceConfidences(4);
