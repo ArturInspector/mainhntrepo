@@ -79,8 +79,8 @@ export function ConcordiumVerify({
       const { data } = await response.json();
 
       const proof = encodeAbiParameters(
-        parseAbiParameters("bytes32, uint256, bytes"),
-        [data.concordiumAccountHash, BigInt(data.timestamp), data.signature]
+        parseAbiParameters("bytes32"),
+        [data.uid as `0x${string}`]
       );
 
       setStep("submitting");
