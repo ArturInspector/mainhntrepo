@@ -14,6 +14,8 @@ contract Deploy is Script {
     function run() external {
         uint256 deployerPk = vm.envUint("PRIVATE_KEY");
         address oracle = vm.envAddress("BACKEND_ORACLE");
+        address easAddress = vm.envAddress("EAS_ADDRESS");
+        bytes32 schemaUID = vm.envBytes32("EAS_SCHEMA_UID");
 
         vm.startBroadcast(deployerPk);
 
@@ -22,15 +24,14 @@ contract Deploy is Script {
 
         token.transfer(address(aggregator), 500_000 * 1e18);
 
-        GitcoinAdapter gitcoin = new GitcoinAdapter(address(aggregator), oracle);
-        PoHAdapter poh = new PoHAdapter(address(aggregator), oracle);
-        BrightIDAdapter brightid = new BrightIDAdapter(address(aggregator), oracle);
+        GitcoinAdapter gitcoin = new GitcoinAdapter(easAddress, schemaUID, address(aggregator), oracle);
+        PoHAdapter poh = new PoHAdapter(easAddress, schemaUID, address(aggregator), oracle);
+        BrightIDAdapter brightid = new BrightIDAdapter(easAddress, schemaUID, address(aggregator), oracle);
+        ConcordiumAdapter concordium = new ConcordiumAdapter(easAddress, schemaUID, address(aggregator), oracle);
 
         aggregator.addAdapter(address(gitcoin), 1);
         aggregator.addAdapter(address(poh), 2);
         aggregator.addAdapter(address(brightid), 3);
-
-        ConcordiumAdapter concordium = new ConcordiumAdapter(address(aggregator), oracle);
         aggregator.addAdapter(address(concordium), 4);
 
         vm.stopBroadcast();
