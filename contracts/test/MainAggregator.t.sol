@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "./helpers/Fixtures.sol";
 import "./helpers/ProofFactory.sol";
+import "../src/adapters/OracleAdapter.sol";
 
 contract MainAggregatorTest is Fixtures {
 
@@ -20,7 +21,7 @@ contract MainAggregatorTest is Fixtures {
     }
 
     function test_registerVerification_transfersTokenReward() public {
-        (bytes memory proof,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
+        (bytes memory proof,) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, user, 75);
         gitcoinAdapter.verifyAndRegister(user, proof);
 
         assertEq(token.balanceOf(user), aggregator.TOKEN_REWARD());
@@ -33,11 +34,11 @@ contract MainAggregatorTest is Fixtures {
     }
 
     function test_registerVerification_revertDuplicateUniqueId() public {
-        (bytes memory proof, bytes32 userId) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
+        (bytes memory proof, bytes32 userId) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, user, 75);
         gitcoinAdapter.verifyAndRegister(user, proof);
 
-        bytes memory proof2 = ProofFactory.gitcoinWithId(vm, oraclePk, user2, 75, userId);
-        vm.expectRevert(GitcoinAdapter.ProofAlreadyUsed.selector);
+        bytes memory proof2 = ProofFactory.gitcoinWithId(mockEAS, oracle, schemaUID, user2, userId);
+        vm.expectRevert(MainAggregator.DuplicateVerification.selector);
         gitcoinAdapter.verifyAndRegister(user2, proof2);
     }
 
@@ -53,14 +54,14 @@ contract MainAggregatorTest is Fixtures {
 
     function test_registerVerification_revertPaused() public {
         aggregator.pause();
-        (bytes memory proof,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
+        (bytes memory proof,) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, user, 75);
         vm.expectRevert();
         gitcoinAdapter.verifyAndRegister(user, proof);
         aggregator.unpause();
     }
 
     function test_isVerifiedHuman_trueAfterVerification() public {
-        (bytes memory proof,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
+        (bytes memory proof,) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, user, 75);
         gitcoinAdapter.verifyAndRegister(user, proof);
         assertTrue(aggregator.isVerifiedHuman(user));
     }
@@ -70,7 +71,7 @@ contract MainAggregatorTest is Fixtures {
     }
 
     function test_getTrustScore_nonZeroAfterVerification() public {
-        (bytes memory proof,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
+        (bytes memory proof,) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, user, 75);
         gitcoinAdapter.verifyAndRegister(user, proof);
         assertGt(aggregator.getTrustScore(user), 0);
         assertLe(aggregator.getTrustScore(user), 100);
@@ -103,7 +104,7 @@ contract MainAggregatorTest is Fixtures {
     }
 
     function test_getVerificationByIndex_success() public {
-        (bytes memory proof,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
+        (bytes memory proof,) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, user, 75);
         gitcoinAdapter.verifyAndRegister(user, proof);
 
         MainAggregator.VerificationData memory v = aggregator.getVerificationByIndex(user, 0);
@@ -123,7 +124,7 @@ contract MainAggregatorTest is Fixtures {
     }
 
     function test_invalidateVerification_invalidatesEntry() public {
-        (bytes memory proof,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
+        (bytes memory proof,) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, user, 75);
         gitcoinAdapter.verifyAndRegister(user, proof);
 
         MainAggregator.VerificationData[] memory vs = aggregator.getAllVerifications(user);
@@ -139,7 +140,7 @@ contract MainAggregatorTest is Fixtures {
     }
 
     function test_getHumanProbability_zeroWhenAllInvalidated() public {
-        (bytes memory proof,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
+        (bytes memory proof,) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, user, 75);
         gitcoinAdapter.verifyAndRegister(user, proof);
 
         MainAggregator.VerificationData[] memory vs = aggregator.getAllVerifications(user);
@@ -149,12 +150,12 @@ contract MainAggregatorTest is Fixtures {
     }
 
     function test_getHumanProbability_higherWithMoreSources() public {
-        (bytes memory proof1,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
+        (bytes memory proof1,) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, user, 75);
         gitcoinAdapter.verifyAndRegister(user, proof1);
         uint256 scoreOne = aggregator.getHumanProbability(user);
 
         vm.warp(block.timestamp + 1);
-        (bytes memory proof2,) = ProofFactory.poh(vm, oraclePk, user);
+        (bytes memory proof2,) = ProofFactory.poh(mockEAS, oracle, schemaUID, user);
         pohAdapter.verifyAndRegister(user, proof2);
         uint256 scoreTwo = aggregator.getHumanProbability(user);
 
@@ -162,7 +163,7 @@ contract MainAggregatorTest is Fixtures {
     }
 
     function test_markSourceCompromised_invalidatesVerificationsInWindow() public {
-        (bytes memory proof,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
+        (bytes memory proof,) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, user, 75);
         gitcoinAdapter.verifyAndRegister(user, proof);
 
         MainAggregator.VerificationData[] memory vs = aggregator.getAllVerifications(user);
@@ -175,7 +176,7 @@ contract MainAggregatorTest is Fixtures {
     }
 
     function test_markSourceCompromised_outsideWindowStillValid() public {
-        (bytes memory proof,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
+        (bytes memory proof,) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, user, 75);
         gitcoinAdapter.verifyAndRegister(user, proof);
 
         MainAggregator.VerificationData[] memory vs = aggregator.getAllVerifications(user);
@@ -200,7 +201,7 @@ contract MainAggregatorTest is Fixtures {
     function test_markSourceCompromised_allowsAfterWindowEnds() public {
         aggregator.markSourceCompromised(1, block.timestamp - 2000, block.timestamp - 1000);
 
-        (bytes memory proof,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
+        (bytes memory proof,) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, user, 75);
         gitcoinAdapter.verifyAndRegister(user, proof);
         assertTrue(aggregator.isVerifiedHuman(user));
     }
@@ -225,7 +226,7 @@ contract MainAggregatorTest is Fixtures {
     }
 
     function test_confirmAttack_updatesStats() public {
-        (bytes memory proof,) = ProofFactory.gitcoin(vm, oraclePk, user, 75);
+        (bytes memory proof,) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, user, 75);
         gitcoinAdapter.verifyAndRegister(user, proof);
 
         aggregator.confirmAttack(user, 1);

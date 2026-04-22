@@ -18,6 +18,14 @@ node_modules
 # IDE
 .vscode
 .idea
+.cursor/
+
+# AI tooling
+.claude/agent-memory/
+.claude/agents/
+docs/AI_DEVELOPMENT_GUIDE.md
+docs/PROMPT_TEMPLATES.md
+docs/HONEST_ANALYSIS.md
 
 # cli
 dist

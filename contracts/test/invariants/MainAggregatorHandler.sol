@@ -7,27 +7,32 @@ import "../../src/core/VerificationToken.sol";
 import "../../src/adapters/GitcoinAdapter.sol";
 import "../../src/adapters/PoHAdapter.sol";
 import "../helpers/ProofFactory.sol";
+import "../helpers/MockEAS.sol";
 
 contract MainAggregatorHandler is Test {
     MainAggregator public aggregator;
     GitcoinAdapter public gitcoinAdapter;
     PoHAdapter public pohAdapter;
     VerificationToken public token;
+    MockEAS public mockEAS;
 
     uint256 public constant ORACLE_PK = 0xA11CE;
     address public oracle;
+    bytes32 public schemaUID;
 
     address[] public actors;
     uint256 public verificationCount;
 
     constructor() {
         oracle = vm.addr(ORACLE_PK);
+        schemaUID = keccak256("bytes32 uniqueId,uint256 qualityScore");
         token = new VerificationToken();
         aggregator = new MainAggregator(address(token));
         token.transfer(address(aggregator), 500_000 * 1e18);
 
-        gitcoinAdapter = new GitcoinAdapter(address(aggregator), oracle);
-        pohAdapter = new PoHAdapter(address(aggregator), oracle);
+        mockEAS = new MockEAS();
+        gitcoinAdapter = new GitcoinAdapter(address(mockEAS), schemaUID, address(aggregator), oracle);
+        pohAdapter = new PoHAdapter(address(mockEAS), schemaUID, address(aggregator), oracle);
 
         aggregator.addAdapter(address(gitcoinAdapter), 1);
         aggregator.addAdapter(address(pohAdapter), 2);
@@ -40,7 +45,7 @@ contract MainAggregatorHandler is Test {
     function registerGitcoin(uint256 actorSeed, uint256 score) external {
         address actor = actors[actorSeed % actors.length];
         score = bound(score, 20, 100);
-        (bytes memory proof,) = ProofFactory.gitcoin(vm, ORACLE_PK, actor, score);
+        (bytes memory proof,) = ProofFactory.gitcoin(mockEAS, oracle, schemaUID, actor, score);
         try gitcoinAdapter.verifyAndRegister(actor, proof) {
             verificationCount++;
         } catch {}
@@ -49,7 +54,7 @@ contract MainAggregatorHandler is Test {
     function registerPoH(uint256 actorSeed) external {
         address actor = actors[actorSeed % actors.length];
         vm.warp(block.timestamp + 1);
-        (bytes memory proof,) = ProofFactory.poh(vm, ORACLE_PK, actor);
+        (bytes memory proof,) = ProofFactory.poh(mockEAS, oracle, schemaUID, actor);
         try pohAdapter.verifyAndRegister(actor, proof) {
             verificationCount++;
         } catch {}

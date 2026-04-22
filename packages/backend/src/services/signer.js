@@ -34,6 +34,14 @@ class SignerService {
     return await this.wallet.signMessage(ethers.getBytes(messageHash));
   }
 
+  async signConcordiumProof(userAddress, concordiumAccountHash, timestamp) {
+    const messageHash = ethers.solidityPackedKeccak256(
+      ['address', 'bytes32', 'uint256'],
+      [userAddress, concordiumAccountHash, timestamp]
+    );
+    return await this.wallet.signMessage(ethers.getBytes(messageHash));
+  }
+
   /**
    * Create userId from user data (deterministic hash)
    * @param {string} source - Source name (e.g., "gitcoin")
